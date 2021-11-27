@@ -166,6 +166,7 @@ class Lexer:
                 """
                 self.advance()
                 return [],IllegalCharError(pos_start,self.pos,"'" + char + "'")
+        """
         # I added this part for some easy mathematic calculations
         take_numbers = []
         take_operator = []
@@ -222,12 +223,8 @@ class Lexer:
             
         if result != 0:     
            print(result)
-                
-            
-                   
-                
-                
-                    
+        """       
+         
         tokens.append(Token(TT_EOF,pos_start=self.pos))        
         return tokens,None
                 
@@ -259,11 +256,13 @@ class Lexer:
 
 ####################################
         #NODES
- 
+
 
 class NumberNode:
     def __init__(self,tok):
         self.tok = tok
+        self.pos_start = self.tok.pos_start
+        self.pos_end = self.tok.pos_end
     def __repr__(self):
         return f'{self.tok}'
 
@@ -273,6 +272,10 @@ class BinOpNode:
         self.left_node = left_node
         self.op_tok = op_tok
         self.right_node = right_node
+        
+        self.pos_start = self.left_node.pos_start
+        self.pos_end = self.right_node.pos_end
+        
     def __repr__(self):
         return f'({self.left_node}, {self.op_tok}, {self.right_node})'
 
@@ -280,6 +283,11 @@ class UnaryOpNode:
     def __init__(self,op_tok,node):
         self.op_tok = op_tok
         self.node = node
+        
+        self.pos_start = self.op_tok.pos_start
+        self.pos_end = node.pos_end
+        
+        
     def __repr__(self):
         return f'({self.op_tok}, {self.node})'
         
@@ -402,6 +410,89 @@ class Parser:
 
 ####################################
 
+
+#################################
+        #VALUES
+        
+
+class Number:
+    def __init__(self,value):
+        self.value = value
+        self.set_pos()
+        
+    def set_pos(self,pos_start=None,pos_end=None):
+        self.pos_start = pos_start
+        self.pos_end = pos_end
+        return self
+    def add_method(self,other):
+        if isinstance(other,Number):
+            return Number(self.value + other.value)
+    def minus_method(self,other):
+        if isinstance(other,Number):
+            return Number(self.value - other.value)
+    def multiple_method(self,other):
+        if isinstance(other,Number):
+            return Number(self.value * other.value)
+    def divide_method(self,other):
+        if isinstance(other,Number):
+            return Number(self.value / other.value)
+    
+    def __repr__(self):
+        return str(self.value)
+
+
+#################################
+
+
+
+
+
+
+
+####################################
+        #INTERPRETER
+
+class Interpreter:
+    def visit(self,node):
+        method_name = f'visit_{type(node).__name__}'
+        method = getattr(self, method_name, self.no_visit_method) #Issue is here beacuse return None
+        return method(node)
+    
+    def no_visit_method(self,node):
+        raise Exception(f'No visit_{type(node).__name__} method defined!')
+    
+    def visit_NumberNode(self,node):
+        return Number(node.tok.value).set_pos(node.pos_start,node.pos_end) # ISSUE IS HERE!!!!
+    
+    
+    def visit_BinOpNode(self,node):
+        
+        left = self.visit(node.left_node)
+        right = self.visit(node.right_node)
+        result=None
+        if left != None and right != None:
+            if node.op_tok.type == TT_PLUS:
+                result = left.add_method(right)
+            elif node.op_tok.type == TT_MINUS:
+                result = left.minus_method(right)
+            elif node.op_tok.type == TT_MUL:
+                result = left.multiple_method(right)
+            elif node.op_tok.type == TT_DIV:
+                result = left.divide_method(right)
+        
+            result = result.set_pos(node.pos_start,node.pos_end)
+        return result
+        
+    def visit_UnaryOpNode(self,node):
+        number = self.visit(node.node)
+        if node.op_tok.type == TT_MINUS:
+            number = number.multiple_method(Number(-1))
+        return number.set_pos(node.pos_start,node.pos_end)
+   
+    
+
+####################################
+
   
 ###################################
        #RUN
@@ -417,7 +508,12 @@ def run(fn,text):
     #Generate AST
     parser = Parser(tokens)
     ast = parser.parse()
-    return ast.node,ast.error
+    if ast.error:
+        return None,ast.error
+    interpreter = Interpreter()
+    result = interpreter.visit(ast.node)
+    
+    return result,None
        
        
        
