@@ -10,6 +10,8 @@ import Prometheum
 
 while True:
     text = input("prometheum => ")
+    if text == "exit":
+        break
     result,error = Prometheum.run('<stdio>',text)
     
     if error:
