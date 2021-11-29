@@ -6,16 +6,26 @@ Created on Fri Nov 26 14:13:07 2021
 """
 
 import Prometheum
-
-
+import datetime
 while True:
     text = input("prometheum => ")
-    if text == "exit":
+    if text == "cikis":
         break
-    result,error = Prometheum.run('<stdio>',text)
-    
-    if error:
-        print(error.error_message())
+    elif text == "zaman":
+        print(datetime.datetime.now())
+    elif text == "zaman.yil":
+        time_now = datetime.datetime.now()
+        print(time_now.year)
+    elif text == "zaman.gun":
+        time_now = datetime.datetime.now()
+        print(time_now.day)
     else:
-        print(result)
+        result,error = Prometheum.run('<stdio>',text)
+        if error:
+            print(error.error_message())
+        else:
+            print(result)
+    
+    
+    
     
