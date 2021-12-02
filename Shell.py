@@ -4,7 +4,6 @@ Created on Fri Nov 26 14:13:07 2021
 
 @author: Mahmut Can Gonol
 """
-
 import Prometheum
 import datetime
 while True:
@@ -23,7 +22,7 @@ while True:
         result,error = Prometheum.run('<stdio>',text)
         if error:
             print(error.error_message())
-        else:
+        elif result:
             print(result)
     
     
