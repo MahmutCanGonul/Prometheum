@@ -11,6 +11,49 @@ import platform
 import os
 import tkinter
 import calendar
+import speedtest
+import wikipedia as wiki
+
+
+def SpeedTest():
+    test = speedtest.Speedtest()
+    print("Performing download test...")
+    download_perform = test.download()
+    print("Performing upload test...")
+    upload_perform = test.upload()
+    ping_perform = test.results.ping
+    
+    print(f"Download speed: {download_perform /1024 / 1024:.2f} Mbit/s")
+    print(f"Upload speed: {upload_perform /1024 / 1024:.2f} Mbit/s")
+    print(f"Ping: {ping_perform:.2f} ms")
+    
+def Calendar():
+     year_input = input("Enter a year please: ") 
+     if  year_input.isdigit():
+         gui = tkinter.Tk()
+         gui.config(background='grey')
+         gui.title("Calender for the year")
+         gui.geometry("550x600")
+         year = int(year_input)
+         gui_content= calendar.calendar(year)
+         calYear = tkinter.Label(gui, text= gui_content, font= "Consolas 10 bold")
+         calYear.grid(row=5, column=1,padx=20)
+         gui.mainloop()
+     else:
+         print("Year is not valid!")
+
+def Wikipedia():
+    search_input = input("What do you want to search in Wikipedia?")
+   
+    if len(search_input) > 0:
+       try:
+            info = wiki.summary(search_input)
+            print(info)
+       except:
+           print("I can not find a result...")
+    else:
+        print("I can not find a result...")
+
 
 while True:
     text = input("prometheum => ")
@@ -34,26 +77,22 @@ while True:
     elif text == "clear":
         os.system('cls')
     elif text == "Calendar.pro":
-        year_input = input("Enter a year please: ") 
-        if  year_input.isdigit():
-            gui = tkinter.Tk()
-            gui.config(background='grey')
-            gui.title("Calender for the year")
-            gui.geometry("550x600")
-            year = int(year_input)
-            gui_content= calendar.calendar(year)
-            calYear = tkinter.Label(gui, text= gui_content, font= "Consolas 10 bold")
-            calYear.grid(row=5, column=1,padx=20)
-            gui.mainloop()
-        else:
-            print("Year is not valid!")
-        
+         Calendar()
+    elif  text == "NetSpeed.pro":
+          SpeedTest()
+    elif text == "Wikipedia.pro":
+        Wikipedia()
     else:
         txt = text.lower()
         if txt == "handrecognition" or txt == "hand recognition" or  txt == "handrecognition.pro" or txt == "hand recognition.pro" or txt == "handrecognition." :
             print("True syntax is ----> HandRecognition.pro")
         elif txt == "calendar" or txt == "calendar.":
             print("True syntax is ----> Calendar.pro")
+        elif txt == "netspeed" or txt == "net speed" or  txt == "netspeed.pro" or txt == "net speed.pro" or txt == "netspeed." :
+            print("True syntax is ----> NetSpeed.pro")
+        elif txt == "wikipedia" or txt == "wikipedia.":
+            print("True syntax is ----> Wikipedia.pro")
+      
         else:
             result,error = Prometheum.run('<stdio>',text)
             if error:
@@ -64,4 +103,7 @@ while True:
     
     
  
+    
+    
+    
      
