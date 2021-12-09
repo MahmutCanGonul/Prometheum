@@ -13,19 +13,225 @@ import tkinter
 import calendar
 import speedtest
 import wikipedia as wiki
+import git
+import yara
+import sys
+from PIL import Image
+from PIL.ExifTags import GPSTAGS, TAGS
+import exifread
+import phonenumbers
+from phonenumbers import geocoder
+from phonenumbers import carrier
+from phonenumbers import timezone
 
+
+
+"""
+import scapy.all as scapy
+import re
+
+def WifiScanner():
+    print("If you want exit, please enter 'exit' ")
+    ip_add_range_pattern = re.compile("^(?:[0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]*$")
+    error =False
+# Get the address range to ARP
+    while True:
+       
+       ip_add_range_entered = input("\nPlease enter the ip address and range that you want to send the ARP request to (ex 192.168.1.0/24): ")
+       if ip_add_range_entered == 'exit':
+           break
+       try: 
+           if ip_add_range_pattern.search(ip_add_range_entered):
+              print(f"{ip_add_range_entered} is a valid ip address range")
+              break
+           else:
+               print(f"{ip_add_range_entered} is a invalid ip address range! Check agein ip address")
+       except:
+           error = True
+           print(f"{ip_add_range_entered} is a invalid ip address range! Check agein ip address")
+           
+
+# Try ARPing the ip address range supplied by the user. 
+# The arping() method in scapy creates a pakcet with an ARP message 
+# and sends it to the broadcast mac address ff:ff:ff:ff:ff:ff.
+# If a valid ip address range was supplied the program will return 
+# the list of all results.
+    if error == False:
+        if ip_add_range_entered != 'exit':
+            arp_result = scapy.arping(ip_add_range_entered)
+            print(arp_result)
+
+"""
+def PhoneNumberInfo():
+    phoneNumber = input("Enter a phone number: ")
+    if '+' in phoneNumber:
+        try:
+            ch_number = phonenumbers.parse(phoneNumber,"CH")
+            country = geocoder.description_for_number(ch_number,"en")
+            ro_number = phonenumbers.parse(phoneNumber,"RO")
+            operator = carrier.name_for_number(ro_number,"en")
+            gb_number = phonenumbers.parse(phoneNumber, "GB")
+            timeZone = timezone.time_zones_for_number(gb_number)
+            print(f"Country --> {country} && Operator --> {operator}")
+            print(f"Location --> {timeZone}")
+             
+        except:
+            print("Invalid phone number!")
+    else:
+        print("Add '+' for the phone number!")
+            
+            
+
+def create_google_maps_url(gps_coords): 
+    print(gps_coords["lat"][0])  
+    print(gps_coords["lat"][1])   
+    print(gps_coords["lat"][2])
+    print(gps_coords["lat_ref"])
+    
+    print(gps_coords["lon"][0])  
+    print(gps_coords["lon"][1])   
+    print(gps_coords["lon"][2])
+    print(gps_coords["lon_ref"])
+    
+    lat_1 = str(gps_coords["lat"][0])
+    lat_1 = lat_1.replace('(','')
+    lat_1 = lat_1.replace(')','')
+    
+    lat_2 = str(gps_coords["lat"][1])
+    lat_2 = lat_2.replace('(','')
+    lat_2 = lat_2.replace(')','')
+    
+    lat_3 = str(gps_coords["lat"][2])
+    lat_3 = lat_3.replace('(','')
+    lat_3 = lat_3.replace(')','')
+    
+    lon_1 = str(gps_coords["lon"][0])
+    lon_1 = lon_1.replace('(','')
+    lon_1 = lon_1.replace(')','')
+    
+    lon_2 = str(gps_coords["lon"][1])
+    lon_2 = lon_2.replace('(','')
+    lon_2 = lon_2.replace(')','')
+    
+    lon_3 = str(gps_coords["lon"][2])
+    lon_3 = lon_3.replace('(','')
+    lon_3 = lon_3.replace(')','')
+    
+    result = lat_1.split(',')
+    result2 = lat_2.split(',')
+    result3 = lat_3.split(',')
+    result4 = lon_1.split(',')
+    result5 = lon_2.split(',')
+    result6 = lon_3.split(',')
+    
+    degress =[]
+    degress.append(float(float(result[0])) / float(result[1]))
+    degress.append(float(float(result2[0])) / float(result2[1]))
+    degress.append(float(float(result3[0])) / float(result3[1]))
+    degress.append(float(float(result4[0])) / float(result4[1]))
+    degress.append(float(float(result5[0])) / float(result5[1]))
+    degress.append(float(float(result6[0])) / float(result6[1]))
+    # Exif data stores coordinates in degree/minutes/seconds format. To convert to decimal degrees.
+    # We extract the data from the dictionary we sent to this function for latitudinal data.
+    dec_deg_lat = convert_decimal_degrees(float(gps_coords["lat"][0]),  float(gps_coords["lat"][1]), float(gps_coords["lat"][2]), gps_coords["lat_ref"])
+    # We extract the data from the dictionary we sent to this function for longitudinal data.
+    dec_deg_lon = convert_decimal_degrees(float(gps_coords["lon"][0]),  float(gps_coords["lon"][1]), float(gps_coords["lon"][2]), gps_coords["lon_ref"])
+    # We return a search string which can be used in Google Maps
+    return f"https://maps.google.com/?q={dec_deg_lat},{dec_deg_lon}"
+
+
+def CreateGoogleURLOption2(path):
+    if '.jpg' or '.jpeg' or '.png' or '.jfif' in path:
+        try:
+            tags = exifread.process_file(open(path,'rb'))
+            geo = {i:tags[i] for i in tags.keys() if i.startswith('GPS')}
+            print(geo)
+            if geo:
+                gps_lat = geo['GPS GPSLatitude']
+                gps_lon = geo['GPS GPSLongitude']
+                gps_date = geo['GPS GPSDate']
+                print(f"Date ---> {gps_date}")
+                print(f"https://maps.google.com/?q={gps_lat},{gps_lon}")
+            else:
+                print("There is no GPS Info!")
+                
+        except:
+            print("There is no GPS Info!")
+    else:
+        if path:
+            print("Invalid path!")
+    
+
+# Converting to decimal degrees for latitude and longitude is from degree/minutes/seconds format is the same for latitude and longitude. So we use DRY principles, and create a seperate function.
+def convert_decimal_degrees(degree, minutes, seconds, direction):
+    decimal_degrees = degree + minutes / 60 + seconds / 3600
+    # A value of "S" for South or West will be multiplied by -1
+    if direction == "S" or direction == "W":
+        decimal_degrees *= -1
+    return decimal_degrees
+
+def FindLocationFromImage():
+     
+     
+    file = input("Enter a from local image path: ")
+    CreateGoogleURLOption2(file)
+    if len(file) > 0:
+        control = file.split('.')
+        if control[len(control)-1] == "jpg" or control[len(control)-1] == "jpeg" or control[len(control)-1] == "png" or control[len(control)-1] == "jfif":
+             
+            try:
+               image = Image.open(file)
+               print(f"_______________________________________________________________{file}_______________________________________________________________")
+               gps_coords = {}
+               # We check if exif data are defined for the image. 
+               if image._getexif() == None:
+                  print(f"{file} contains no exif data.")
+               else:    
+                   for tag, value in image._getexif().items():
+                # If you print the tag without running it through the TAGS.get() method you'll get numerical values for every tag. We want the tags in human-readable form. 
+                # You can see the tags and the associated decimal number in the exif standard here: https://exiv2.org/tags.html
+                       tag_name = TAGS.get(tag)
+                       print(tag_name)
+                       if tag_name == "GPSInfo":
+                          for key, val in value.items():
+                        # Print the GPS Data value for every key to the screen.
+                             print(f"{GPSTAGS.get(key)} - {val}")
+                        # We add Latitude data to the gps_coord dictionary which we initialized in line 110.
+                             if GPSTAGS.get(key) == "GPSLatitude":
+                                gps_coords["lat"] = val
+                        # We add Longitude data to the gps_coord dictionary which we initialized in line 110.
+                             elif GPSTAGS.get(key) == "GPSLongitude":
+                                gps_coords["lon"] = val
+                        # We add Latitude reference data to the gps_coord dictionary which we initialized in line 110.
+                             elif GPSTAGS.get(key) == "GPSLatitudeRef":
+                                gps_coords["lat_ref"] = val
+                        # We add Longitude reference data to the gps_coord dictionary which we initialized in line 110.
+                             elif GPSTAGS.get(key) == "GPSLongitudeRef":
+                                gps_coords["lon_ref"] = val 
+                       else:
+                          print(f"{tag_name} - {value}")
+                   if gps_coords:
+                      print(create_google_maps_url(gps_coords))  
+                   else:
+                      print()
+            except:
+               print("File format not supported or can not find a location!")
+     
 
 def SpeedTest():
-    test = speedtest.Speedtest()
-    print("Performing download test...")
-    download_perform = test.download()
-    print("Performing upload test...")
-    upload_perform = test.upload()
-    ping_perform = test.results.ping
+    try:
+        test = speedtest.Speedtest()
+        print("Performing download test...")
+        download_perform = test.download()
+        print("Performing upload test...")
+        upload_perform = test.upload()
+        ping_perform = test.results.ping
     
-    print(f"Download speed: {download_perform /1024 / 1024:.2f} Mbit/s")
-    print(f"Upload speed: {upload_perform /1024 / 1024:.2f} Mbit/s")
-    print(f"Ping: {ping_perform:.2f} ms")
+        print(f"Download speed: {download_perform /1024 / 1024:.2f} Mbit/s")
+        print(f"Upload speed: {upload_perform /1024 / 1024:.2f} Mbit/s")
+        print(f"Ping: {ping_perform:.2f} ms")
+    except:
+        print("Something get error try later...")
     
 def Calendar():
      year_input = input("Enter a year please: ") 
@@ -54,6 +260,104 @@ def Wikipedia():
     else:
         print("I can not find a result...")
 
+def Github():
+    repo_url = input("Enter the target repo url: ")
+    if repo_url:
+       your_file = input("Enter the your file location: ")
+       if your_file:
+           try:
+              print("Process...")
+              git.Git(your_file).clone(repo_url)
+              print("Success! Repo clone on ",your_file)
+           except:
+               print("Invalid clone request!")
+               
+       else:
+           print("Invalid clone request!")
+    else:
+        print("Invalid clone request!")
+
+def History(commits):
+    if len(commits) > 0:
+        for i in range(len(commits)):
+            print(commits[i])
+    else:
+        print("No commits!")
+ 
+def MalwareDetect():
+    rules_path = "C:\Malware Detect"
+    #Read files
+    peid_rules = yara.compile(rules_path + '\peid.yar')
+    packer_rules = yara.compile(rules_path + '\packer.yar')
+    crypto_rules = yara.compile(rules_path + '\crypto_signatures.yar')
+    exe_file_path = input("Enter the target local file path: ")
+    is_foundMalware = False
+    if exe_file_path:
+        try:
+           matches = crypto_rules.match(exe_file_path)
+           if matches:
+              is_foundMalware=True 
+              print('Cryptors ====> Found')
+              print(matches)
+        except:
+        #I always add this exception thing, because I don't know what could happen
+              print('cryptor exception, something get issue...')
+              is_foundMalware=True
+        if is_foundMalware == False:
+            print("Cryptors ====> Not Found")
+        
+        is_foundMalware=False
+        #detect packers
+
+        try:
+            matches = packer_rules.match(exe_file_path)
+            if matches:
+               is_foundMalware=True
+               print('Packers  ====> Found')
+               print(matches)
+        except:
+            is_foundMalware=True
+            print('packer exception, something get issue...')
+     
+        
+    if is_foundMalware == False:
+        print("Packers  ====> Not Found")
+        
+    is_foundMalware = False
+    
+        
+    packers = ['AHTeam', 'Armadillo', 'Stelth', 'yodas', 'ASProtect', 'ACProtect', 'PEnguinCrypt', 
+ 'UPX', 'Safeguard', 'VMProtect', 'Vprotect', 'WinLicense', 'Themida', 'WinZip', 'WWPACK',
+ 'Y0da', 'Pepack', 'Upack', 'TSULoader'
+ 'SVKP', 'Simple', 'StarForce', 'SeauSFX', 'RPCrypt', 'Ramnit', 
+ 'RLPack', 'ProCrypt', 'Petite', 'PEShield', 'Perplex',
+ 'PELock', 'PECompact', 'PEBundle', 'RLPack', 'NsPack', 'Neolite', 
+ 'Mpress', 'MEW', 'MaskPE', 'ImpRec', 'kkrunchy', 'Gentee', 'FSG', 'Epack', 
+ 'DAStub', 'Crunch', 'CCG', 'Boomerang', 'ASPAck', 'Obsidium','Ciphator',
+ 'Phoenix', 'Thoreador', 'QinYingShieldLicense', 'Stones', 'CrypKey', 'VPacker',
+ 'Turbo', 'codeCrypter', 'Trap', 'beria', 'YZPack', 'crypt', 'crypt', 'pack',
+ 'protect', 'tect'
+]
+    try:
+       matches = peid_rules.match(exe_file_path)
+       if matches:
+          for match in matches:
+             for packer in packers:
+        #this line is simply trying to see if one of the known packers has been detected
+                if packer.lower() in match.lower():
+                   is_foundMalware = True
+                   print('Packers  ====> Found')
+                   print(packer)
+    except:
+          is_foundMalware=True
+          print('error')
+    
+    if is_foundMalware == False:
+        print('Packers  ====> Not Found')
+ 
+ 
+ 
+commits = []
 
 while True:
     text = input("prometheum => ")
@@ -68,7 +372,7 @@ while True:
         time_now = datetime.datetime.now()
         print(time_now.day)
     elif text == "HandRecognition.pro":
-        print("If you want exit please enter 'q' ")
+        print("If you want exit, please enter the screen and  enter the 'q' ")
         HandRecognition.main()
     elif text == "system":
          print(platform.platform())      
@@ -82,28 +386,66 @@ while True:
           SpeedTest()
     elif text == "Wikipedia.pro":
         Wikipedia()
+    elif text == "Github.pro":
+        Github()
+    elif text == "History.pro":
+        History(commits)
+    elif text == "ImageInfo.pro":
+        FindLocationFromImage()
+    elif text == "MalwareDetect.pro":
+        MalwareDetect()
+    elif text == "PhoneNumberInfo.pro":
+        PhoneNumberInfo()
+    elif text == "color.green":
+        os.system('COLOR A')
+    elif text == "color.blue":
+        os.system('COLOR 9')
+    elif text == "color.aqua":
+        os.system('COLOR B')
+    elif text == "color.red":
+        os.system('COLOR C')
+    elif text == "color.purple":
+        os.system('COLOR D')
+    elif text == "color.yellow":
+        os.system('COLOR E')
+    elif text == "color.white":
+        os.system('COLOR F')
     else:
         txt = text.lower()
-        if txt == "handrecognition" or txt == "hand recognition" or  txt == "handrecognition.pro" or txt == "hand recognition.pro" or txt == "handrecognition." :
+        if txt == "handrecognition" or txt == "hand recognition" or  txt == "handrecognition.pr" or txt == "hand recognition.pro" or txt == "handrecognition." :
             print("True syntax is ----> HandRecognition.pro")
         elif txt == "calendar" or txt == "calendar.":
             print("True syntax is ----> Calendar.pro")
-        elif txt == "netspeed" or txt == "net speed" or  txt == "netspeed.pro" or txt == "net speed.pro" or txt == "netspeed." :
+        elif txt == "netspeed" or txt == "net speed" or  txt == "netspeed.pr" or txt == "net speed.pro" or txt == "netspeed." :
             print("True syntax is ----> NetSpeed.pro")
         elif txt == "wikipedia" or txt == "wikipedia.":
             print("True syntax is ----> Wikipedia.pro")
-      
+        elif txt == "github" or txt == "github.":
+            print("True syntax is ----> Github.pro")
+        elif txt == "color":
+            print("True syntax is ---->  color.COLOR_NAME / EX: color.green")
+        elif txt == "history" or  txt == "history.":
+            print("True syntax is ---->  History.pro")
+        elif txt == "imageinfo" or txt == "image info" or  txt == "image" or txt == "image info.pro" or txt == "imageinfo." :
+            print("True syntax is ---->  ImageInfo.pro")
+        elif txt == "malwaredetection" or txt == "malware detection" or  txt == "malwaredetection." or txt == "malware detection.":
+            print("True syntax is ---->  MalwareDetection.pro")
+        elif txt == "phone" or txt == "phonenumber" or  txt == "phonenumberinfo." or txt == "phone number." or txt == "phonenumber.":
+            print("True syntax is ---->  PhoneNumberInfo.pro")
         else:
-            result,error = Prometheum.run('<stdio>',text)
-            if error:
-               print(error.error_message())
-            elif result:
-               print(result)
-    
-    
+            if len(text)>0:
+                result,error = Prometheum.run('<stdio>',text)
+                if error:
+                   print(error.error_message())
+                elif result:
+                   print(result)
+    if len(text)>0:
+        commits.append(text)
     
  
-    
-    
+ 
+   
+ 
+   
     
      
