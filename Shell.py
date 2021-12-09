@@ -355,12 +355,26 @@ def MalwareDetect():
     if is_foundMalware == False:
         print('Packers  ====> Not Found')
  
- 
+    
+
+
  
 commits = []
-
+path = "{0}".format(os.getcwd())
+is_cd=False
 while True:
-    text = input("prometheum => ")
+    is_cd=False
+    text = input(f"prometheum: {path} ==> ")
+    control_cd = text.split(' ')
+    if len(control_cd) == 2:
+        if control_cd[0] == "cd":
+            is_cd = True
+            try:
+                os.chdir(control_cd[1])
+                path = "{0}".format(os.getcwd())
+            except:
+                print("Invalid path!")
+            
     if text == "exit":
         break
     elif text == "time":
@@ -411,6 +425,7 @@ while True:
     elif text == "color.white":
         os.system('COLOR F')
     else:
+        
         txt = text.lower()
         if txt == "handrecognition" or txt == "hand recognition" or  txt == "handrecognition.pr" or txt == "hand recognition.pro" or txt == "handrecognition." :
             print("True syntax is ----> HandRecognition.pro")
@@ -433,7 +448,7 @@ while True:
         elif txt == "phone" or txt == "phonenumber" or  txt == "phonenumberinfo." or txt == "phone number." or txt == "phonenumber.":
             print("True syntax is ---->  PhoneNumberInfo.pro")
         else:
-            if len(text)>0:
+            if len(text)>0 and is_cd == False:
                 result,error = Prometheum.run('<stdio>',text)
                 if error:
                    print(error.error_message())
