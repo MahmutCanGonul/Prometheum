@@ -365,7 +365,7 @@ is_cd=False
 while True:
     is_cd=False
     text = input(f"prometheum: {path} ==> ")
-    control_cd = text.split(' ')
+    control_cd = text.split(None,1)
     if len(control_cd) == 2:
         if control_cd[0] == "cd":
             is_cd = True
@@ -374,7 +374,9 @@ while True:
                 path = "{0}".format(os.getcwd())
             except:
                 print("Invalid path!")
-            
+     
+                
+        
     if text == "exit":
         break
     elif text == "time":
