@@ -86,7 +86,7 @@ def Ethereum():
                 print(f"Ethereum Difficulty --> {difficulty_last_block}")
                 print(web3.toJSON(last_block))
             elif choice == "2":
-                ganache_url = "HTTP://127.0.0.1:7545"
+                ganache_url = "https://mainnet.infura.io/v3/f3092718f2f146169c2b1f7d53b99b7a"
                 web3 = Web3(Web3.HTTPProvider(ganache_url))
                 account_1 = input("Enter a Your Ethereum Address: ")
                 if account_1:
