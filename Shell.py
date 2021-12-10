@@ -26,8 +26,6 @@ from phonenumbers import timezone
 from web3 import Web3 #web3 package version 5.5.0
 from flask import Flask,jsonify
 
-
-
 """
 import scapy.all as scapy
 import re
@@ -509,6 +507,8 @@ while True:
             print("True syntax is ---->  MalwareDetection.pro")
         elif txt == "phone" or txt == "phonenumber" or  txt == "phonenumberinfo." or txt == "phone number." or txt == "phonenumber.":
             print("True syntax is ---->  PhoneNumberInfo.pro")
+        elif txt == "ethereum" or txt == "ethereum.":
+            print("True syntax is ---->  Ethereum.pro")
         else:
             if len(text)>0 and is_cd == False:
                 result,error = Prometheum.run('<stdio>',text)
