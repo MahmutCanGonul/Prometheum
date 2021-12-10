@@ -23,6 +23,8 @@ import phonenumbers
 from phonenumbers import geocoder
 from phonenumbers import carrier
 from phonenumbers import timezone
+from web3 import Web3 #web3 package version 5.5.0
+from flask import Flask,jsonify
 
 
 
@@ -62,6 +64,62 @@ def WifiScanner():
             print(arp_result)
 
 """
+def Ethereum():
+    infuro_url = "https://mainnet.infura.io/v3/f3092718f2f146169c2b1f7d53b99b7a"
+    try:
+        web3 = Web3(Web3.HTTPProvider(infuro_url))
+        if web3.isConnected():
+            print("Connect Ethereum --> True")
+            print("1.Info about Ethereum")
+            print("2.Send Ethereum Another Account")
+             
+            choice = input("Enter 1 or 2: ")
+            if choice == "1":
+                blocks_num = web3.eth.blockNumber
+                last_block = web3.eth.getBlock('latest')
+                last_block_trans = web3.eth.getBlockTransactionCount('latest')
+                difficulty_last_block = last_block.difficulty
+                all_trans = web3.eth.getTransactionCount
+                print(f"Ethereum Block Numbers --> {blocks_num}")
+                print(f"Ethereum All Transactions Number --> {all_trans}") 
+                print(f"Ethereum Last Block Transactions Number --> {last_block_trans}") 
+                print(f"Ethereum Difficulty --> {difficulty_last_block}")
+                print(web3.toJSON(last_block))
+            elif choice == "2":
+                ganache_url = "HTTP://127.0.0.1:7545"
+                web3 = Web3(Web3.HTTPProvider(ganache_url))
+                account_1 = input("Enter a Your Ethereum Address: ")
+                if account_1:
+                    balance = web3.eth.getBalance(account_1)
+                    print(f"ETH Balance In Your Address: {balance}")
+                    account_2 = input("Enter a Another Ethereum Address: ")
+                    if account_2:
+                        private_key = input("Enter a Your Private Key: ")
+                        value = int(input("Enter a ETH Amount: "))
+                        nonce = web3.eth.getTransactionCount(account_1)
+                        if private_key and value:
+                            tx = {'nonce':nonce,
+                                  'to':account_2,
+                                  'value':web3.toWei(value,'ether'),
+                                  'gas':200000,
+                                  'gasPrice':web3.toWei('50','gwei')}
+                            signed_tx = web3.eth.account.signTransaction(tx,private_key)
+                            tx_hash = web3.eth.sendRawTransaction(signed_tx.rawTransaction)
+                            print(f"Transaction is success! Hash --> {tx_hash}")
+        else:
+            print("Connect Ethereum --> False")
+    except:
+          print("Ethereum Situation --> Error")        
+    
+    
+
+
+def ListFiles(path):
+    arr = os.listdir(path)
+    if len(arr) > 0:
+        for i in range(len(arr)):
+            print(arr[i])
+
 def PhoneNumberInfo():
     phoneNumber = input("Enter a phone number: ")
     if '+' in phoneNumber:
@@ -260,10 +318,10 @@ def Wikipedia():
     else:
         print("I can not find a result...")
 
-def Github():
+def Github(path):
     repo_url = input("Enter the target repo url: ")
     if repo_url:
-       your_file = input("Enter the your file location: ")
+       your_file = path
        if your_file:
            try:
               print("Process...")
@@ -355,8 +413,6 @@ def MalwareDetect():
     if is_foundMalware == False:
         print('Packers  ====> Not Found')
  
-    
-
 
  
 commits = []
@@ -379,6 +435,8 @@ while True:
         
     if text == "exit":
         break
+    elif text == "status":
+        ListFiles(path)
     elif text == "time":
         print(datetime.datetime.now())
     elif text == "time.year":
@@ -398,12 +456,14 @@ while True:
         os.system('cls')
     elif text == "Calendar.pro":
          Calendar()
+    elif text == "Ethereum.pro":
+        Ethereum()
     elif  text == "NetSpeed.pro":
           SpeedTest()
     elif text == "Wikipedia.pro":
         Wikipedia()
     elif text == "Github.pro":
-        Github()
+        Github(path)
     elif text == "History.pro":
         History(commits)
     elif text == "ImageInfo.pro":
