@@ -25,6 +25,7 @@ from phonenumbers import carrier
 from phonenumbers import timezone
 from web3 import Web3 #web3 package version 5.5.0
 from flask import Flask,jsonify
+import GenerateNFT
 
 """
 import scapy.all as scapy
@@ -92,18 +93,22 @@ def Ethereum():
                     print(f"ETH Balance In Your Address: {balance}")
                     account_2 = input("Enter a Another Ethereum Address: ")
                     if account_2:
+                        balance2= web3.eth.getBalance(account_2)
+                        print(f"ETH Balance In Another Address: {balance2}")
                         private_key = input("Enter a Your Private Key: ")
-                        value = int(input("Enter a ETH Amount: "))
+                        value =   input("Enter a ETH Amount: ")
                         nonce = web3.eth.getTransactionCount(account_1)
                         if private_key and value:
-                            tx = {'nonce':nonce,
+                               tx = {'nonce':nonce,
                                   'to':account_2,
-                                  'value':web3.toWei(value,'ether'),
+                                  'value':web3.toWei(float(value),'ether'),
                                   'gas':200000,
                                   'gasPrice':web3.toWei('50','gwei')}
-                            signed_tx = web3.eth.account.signTransaction(tx,private_key)
-                            tx_hash = web3.eth.sendRawTransaction(signed_tx.rawTransaction)
-                            print(f"Transaction is success! Hash --> {tx_hash}")
+                               signed_tx = web3.eth.account.signTransaction(tx,private_key)
+                               tx_hash = web3.eth.sendRawTransaction(signed_tx.rawTransaction)
+                               print(f"Transaction is success! Hash --> {tx_hash}")
+                        else:
+                            print("Transaction --> Error")
         else:
             print("Connect Ethereum --> False")
     except:
@@ -470,6 +475,8 @@ while True:
         MalwareDetect()
     elif text == "PhoneNumberInfo.pro":
         PhoneNumberInfo()
+    elif text == "GenerateNFT.pro":
+        GenerateNFT.GenerateNFT()
     elif text == "color.green":
         os.system('COLOR A')
     elif text == "color.blue":
@@ -509,6 +516,8 @@ while True:
             print("True syntax is ---->  PhoneNumberInfo.pro")
         elif txt == "ethereum" or txt == "ethereum.":
             print("True syntax is ---->  Ethereum.pro")
+        elif txt == "generate" or txt == "generatenft" or txt == "nft" or txt == "generatenft.":
+            print("True syntax is ---->  GenerateNFT.pro")
         else:
             if len(text)>0 and is_cd == False:
                 result,error = Prometheum.run('<stdio>',text)
