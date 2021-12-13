@@ -58,8 +58,11 @@ def AzureGetContanier(container_name):
 def BlobProperties(container_client,blob_service_client,container_name):
     blob_list = container_client.list_blobs()
     is_empty=True
+    print("->BLOBS<-")
+    count=0
     for i in blob_list:
-        print(f"{i.name}\n")
+        count+=1
+        print(f"{count}-->{i.name}\n")
         is_empty=False
     if is_empty:
         print("Container --> Empty")
@@ -117,8 +120,8 @@ def RemoveBlob(container_name):
                 if i.name == container_name:
                      is_foundContainer=True
             if is_foundContainer:
-                choice = input("Do you really delete a container type -->  Y/N")
-                if choice == "Y":
+                choice = input("Do you really delete a container type --> Y/N")
+                if 'Y' in choice:
                     container_client = blob_service_client.get_container_client(container_name)
                     container_client.delete_container()
                     print(f"{container_name} --> Removed")
@@ -132,11 +135,14 @@ def RemoveBlob(container_name):
     
 
 def AzureBlob():
-    print("'1' --> Generate New Container")
-    print("'2' --> Get Container")
-    print("'3' --> Remove Container")
-    print("'exit' --> Exit the Platfrom")
     while True:
+        print("///////////////////////////////////")
+        print("'1' --> Generate New Container")
+        print("'2' --> Get Container")
+        print("'3' --> Remove Container")
+        print("'exit' --> Exit the Platfrom")
+        print("///////////////////////////////////")
+        
         choice = input("Please Enter a Choice: ")
         if choice == "exit":
             break
@@ -152,6 +158,7 @@ def AzureBlob():
             print("Invalid Commits!")
     
      
+AzureBlob()
  
 
       
