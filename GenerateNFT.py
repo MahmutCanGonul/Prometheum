@@ -145,14 +145,14 @@ def AzureBlob():
         elif choice == "2":
             container_name = input("Please Enter a Container Name: ")
             AzureGetContanier(container_name)
-        elif choice == 3:
+        elif choice == "3":
             container_name = input("Please Enter a Container Name: ")
             RemoveBlob(container_name)
         else:
             print("Invalid Commits!")
     
      
-AzureBlob()     
+ 
 
       
 
