@@ -158,20 +158,17 @@ def AzureBlob():
 
 def GenerateNFT():
     print("Don't forget only file png")
+    print("'exit' --> See the result")
     array = []
     nft_counts = input("Enter a how many create a NFT: ")
-    count_values = input("Enter a how many different title a variable: ")
-    if count_values.isdigit():
-       count=0
-       while True:
+    if nft_counts.isdigit():
+        count=0
+        while True: 
+            
+           count+=1
            value = input(f"{count}.Title Enter a image a png format: ")
            if value=="exit":
-              count+=1
-              array.append(str(count))
-              if count >=int(count_values):
                  break
-           elif value=="fullexit":
-               break
            else:
                if '.png' in value:
                    array.append(value)
