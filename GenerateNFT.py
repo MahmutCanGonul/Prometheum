@@ -157,9 +157,6 @@ def AzureBlob():
         else:
             print("Invalid Commits!")
     
-     
-AzureBlob()
- 
 
       
 
