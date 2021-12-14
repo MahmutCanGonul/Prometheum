@@ -14,6 +14,7 @@ import calendar
 import speedtest
 import wikipedia as wiki
 import git
+from github import Github
 import yara
 import sys
 from PIL import Image
@@ -26,7 +27,12 @@ from phonenumbers import timezone
 from web3 import Web3 #web3 package version 5.5.0
 from flask import Flask,jsonify
 import GenerateNFT
+from time import sleep
+import random
+ 
 
+
+ 
 """
 import scapy.all as scapy
 import re
@@ -63,6 +69,57 @@ def WifiScanner():
             print(arp_result)
 
 """
+"""
+def Storj():
+    username = input("Enter a Username: ")
+    password = input("Enter a Password: ")
+    
+    if username and password:
+        (private_key, public_key) = storj.generate_new_key_pair()
+        storj.authenticate(email=username,password=password)
+        storj.public_keys.add(public_key)
+        storj.authenticate(ecdsa_private_key=private_key)
+        print(private_key)
+        print(public_key)
+    
+"""    
+    
+
+
+def Vpn():
+    codeList = ["TR", "US-C", "US", "US-W", "CA", "CA-W",
+            "FR", "DE", "NL", "NO", "RO", "CH", "GB", "HK"]
+    enter_time = datetime.datatime.now()
+    print("' q' --> Disconnect Vpn")
+    print(" 'v' --> Change Vpn Location")
+    code = random.choice(codeList)
+    try:
+        os.system("windscribe connect")
+        while True:
+            
+            if 0xFF == ord("q"):
+                os.system("windscribe disconnect")
+                print("Disconnected the VPN!")
+                exit_time = datetime.datetime.now() - enter_time
+                print(f"Passed Time {exit_time}")
+                break
+            elif 0xFF == ord("v"):
+                code = random.choice(codeList)
+                print("Changing the IP Address.....")
+            
+            
+            os.system("windscribe connect "+code)
+                
+            
+            
+            
+    except Exception as ex:
+        os.system("windscribe disconnect")
+        print("Disconnected the VPN!")
+        print(f"Error --> {ex}")
+        
+
+
 def Ethereum():
     infuro_url = "https://mainnet.infura.io/v3/f3092718f2f146169c2b1f7d53b99b7a"
     try:
@@ -321,23 +378,72 @@ def Wikipedia():
     else:
         print("I can not find a result...")
 
-def Github(path):
-    repo_url = input("Enter the target repo url: ")
-    if repo_url:
-       your_file = path
-       if your_file:
-           try:
-              print("Process...")
-              git.Git(your_file).clone(repo_url)
-              print("Success! Repo clone on ",your_file)
-           except:
-               print("Invalid clone request!")
-               
-       else:
-           print("Invalid clone request!")
+def github(path):
+    access_tok = input("Enter a Own Access Token in Github: ")
+    if access_tok:
+        try:
+            g = Github(access_tok)
+            while True:
+                print("'clone' --> Clone the repo on your directory")
+                print('repo.name --> See the all repo names')
+                print("'search_language' --> Show the repo from the language")
+                print("'repo.files' --> Show the files in repo")
+                print("'repo.traffic' --> Show the repo clone and view traffic")
+                print("'repo.branches' --> Show the branches in repo")
+                print("'exit' --> exit the platfrom")
+                choice = input("Enter a Choice: ")
+                if choice == "clone":
+                    repo_url = input("Enter the target repo url: ")
+                    if repo_url:
+                       your_file = path
+                       if your_file:
+                          print("Process...")
+                          git.Git(your_file).clone(repo_url)
+                          print("Success! Repo clone on ",your_file)
+                elif choice == "repo.name":
+                    for repo in g.get_user().get_repos():
+                        name = repo.name
+                        stars= repo.stargazers_count
+                        print(f"-->Name:{name} Star:{stars}")
+                elif choice == "exit":
+                    break
+                elif choice == "search_language":
+                    soft = input("Enter a software language: --> 'python','c','c#','ruby' ")
+                    if soft:
+                         repos = g.search_repositories(query=f'language:{soft}')
+                         for repo in repos:
+                             print(repo)
+                elif choice == "repo.files":
+                    repo_name = input("Enter a repo name: ")
+                    if repo_name:
+                        repo = g.get_user().get_repo(repo_name)
+                        print(repo)
+                        contents = repo.get_contents("")
+                        for file in contents:
+                            print(file)
+                elif choice == "repo.traffic":
+                    repo_name = input("Enter a repo name: ")
+                    if repo_name:
+                       repo = g.get_user().get_repo(repo_name) 
+                       contents_view = repo.get_views_traffic(per="week")
+                       contents_clone = repo.get_clones_traffic(per="week")
+                       print("//////////// View Traffic ////////////")
+                       print(contents_view)
+                       print("//////////// Clone Traffic ////////////")
+                       print(contents_clone)
+                elif choice == "repo.branches":
+                    repo_name = input("Enter a repo name: ")
+                    if repo_name:
+                        repo = g.get_user().get_repo(repo_name) 
+                        list(repo.get_branches())
+                        
+                    
+                       
+                       
+        except Exception as ex:
+            print(f"Github Error --> {ex}")
     else:
-        print("Invalid clone request!")
-
+         print("You should enter a Access Token for Github Connection!")         
 def History(commits):
     if len(commits) > 0:
         for i in range(len(commits)):
@@ -466,7 +572,7 @@ while True:
     elif text == "Wikipedia.pro":
         Wikipedia()
     elif text == "Github.pro":
-        Github(path)
+        github(path)
     elif text == "History.pro":
         History(commits)
     elif text == "ImageInfo.pro":
