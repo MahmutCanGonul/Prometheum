@@ -11,6 +11,7 @@ import os, uuid
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
 import datetime
 import webbrowser
+import requests
  
 def AzureGenerateContainer():
     try:
@@ -158,7 +159,97 @@ def AzureBlob():
             print("Invalid Commits!")
     
 
-      
+def AzureImageAnalysis():
+    path = input("Enter a URL For Analysis: ")
+    try: 
+       url = "https://microsoft-computer-vision3.p.rapidapi.com/analyze"
+       querystring = {"language":"en","descriptionExclude":"Celebrities","visualFeatures":"ImageType","details":"Celebrities"}
+       payload = "{\r\"url\": \""+path+"\"\r}"
+       headers = {
+    'content-type': "application/json",
+    'x-rapidapi-host': "microsoft-computer-vision3.p.rapidapi.com",
+    'x-rapidapi-key': "843406cdb2msh623e555d8416d8ep1d7e8ajsnb9afd7d794c4"
+    }
+       response = requests.request("POST", url, data=payload, headers=headers, params=querystring)
+       print("Azure Computer Vision --> Success")
+       print(response.json())
+    except Exception as ex:
+        print(f"Azure Computer Vision Error --> {ex}")
+
+def AzureDescribeAnalysis():
+     path = input("Enter a URL For Analysis: ")
+     try:
+         url = "https://microsoft-computer-vision3.p.rapidapi.com/describe"
+
+         querystring = {"language":"en","maxCandidates":"1","descriptionExclude":"Celebrities"}
+
+         payload = "{\r\n    \"url\": \""+path+"\"\r\n}"
+         headers = {
+    'content-type': "application/json",
+    'x-rapidapi-host': "microsoft-computer-vision3.p.rapidapi.com",
+    'x-rapidapi-key': "843406cdb2msh623e555d8416d8ep1d7e8ajsnb9afd7d794c4"
+    }
+
+         response = requests.request("POST", url, data=payload, headers=headers, params=querystring)
+         print(response.json())
+    
+     except Exception as ex:
+        print(f"Azure Computer Vision Error --> {ex}")    
+
+def AzureOCR():
+    path = input("Enter a URL For Analysis: ")
+    try: 
+        url = "https://microsoft-computer-vision3.p.rapidapi.com/detect"
+
+        payload = "{\r\n    \"url\": \""+path+"\"\r\n}"
+        headers = {
+    'content-type': "application/json",
+    'x-rapidapi-host': "microsoft-computer-vision3.p.rapidapi.com",
+    'x-rapidapi-key': "843406cdb2msh623e555d8416d8ep1d7e8ajsnb9afd7d794c4"
+    }
+
+        response = requests.request("POST", url, data=payload, headers=headers)
+
+        print(response.json())
+    except Exception as ex:
+        print(f"Azure Computer Vision Error --> {ex}")    
+
+def AzureTextAI():
+     
+     text = input("Enter a Sentence or Paragraph for text analsysis: ")
+     data = []
+     sending_text = ""
+     
+     if text:
+         data = text.split(' ')
+         if len(data) > 0:
+             for i in range(len(data)):
+                 sending_text += data[i]
+         else:
+             sending_text = text
+         try:
+             
+            url = "https://microsoft-content-moderator2.p.rapidapi.com/ProcessText/Screen"
+            querystring = {"PII":"true","autocorrect":"true","classify":"true"}
+
+            payload = text
+            headers = {
+    'content-type': "text/plain",
+    'x-rapidapi-host': "microsoft-content-moderator2.p.rapidapi.com",
+    'x-rapidapi-key': "843406cdb2msh623e555d8416d8ep1d7e8ajsnb9afd7d794c4"
+    }
+
+            response = requests.request("POST", url, data=payload, headers=headers, params=querystring)
+
+            print(response.json()['PII'])
+         except Exception as ex:
+            no_pii = f"{ex}"
+            if 'PII' in no_pii:
+                print("Azure Computer Vision --> No 'PII' Data")
+            else:
+                print(f"Azure Computer Vision Error --> {no_pii}")  
+            
+
 
 def GenerateNFT():
     print("Don't forget only file png")
