@@ -32,8 +32,12 @@ import random
 import subprocess
 import json
 from web3.middleware import geth_poa_middleware
-import cv2
+import sys
 import numpy as np
+import cv2
+import matplotlib as mpl
+import matplotlib.cm as mtpltcm
+
 """
 import scapy.all as scapy
 import re
@@ -86,7 +90,8 @@ def Storj():
 """  
   
 def thermal_camera():
-    print("If you want exit enter the 'esc' keyword.")
+    print("If you want exit enter the 'exit' keyword.")
+     
     video = cv2.VideoCapture(0,cv2.CAP_DSHOW)
     video.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y','1','6',' '))
     video.set(cv2.CAP_PROP_CONVERT_RGB, 0)
@@ -109,9 +114,6 @@ def thermal_camera():
     # Note: apply the CLAHE on the uint8 image after normalize.
     # CLAHE supposed to work with uint16 - you may try using it without using cv2.normalize
        
-       """
-       cl1 = clahe.apply(ex)
-       """
        nor = cv2.cvtColor(np.uint8(normed), cv2.COLOR_BGR2HSV)  # Convert gray-scale to BGR (no really needed).
 
        cv2.imshow("camera", cv2.resize(nor, dsize=(640, 480), interpolation=cv2.INTER_LINEAR))
@@ -123,7 +125,26 @@ def thermal_camera():
 
     # Grab the next frame from the camera.
        rval, frame = video.read()
-    
+
+     
+def DarkCamera():
+    print("If you want exit enter the 'q' keyword.")
+    cap = cv2.VideoCapture(0)
+    while (True):
+        # Capture frame-by-frame
+        ret, frame = cap.read()
+
+        # Our operations on the frame come here
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        colors = cv2.GaussianBlur(gray,(15,15),0)
+        # Display the resulting frame
+        cv2.imshow('frame', colors)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # When everything done, release the capture
+    cap.release()
+    cv2.destroyAllWindows()    
 
 
 
@@ -641,6 +662,8 @@ while True:
         GenerateNFT.GenerateNFT()
     elif text == "ThermalCamera.pro":
         thermal_camera()
+    elif text == "DarkCamera.pro":
+        DarkCamera()
     elif text == "color.green":
         os.system('COLOR A')
     elif text == "color.blue":
@@ -684,6 +707,8 @@ while True:
             print("True syntax is ---->  GenerateNFT.pro")
         elif txt == "thermal" or txt == "thermalcamera" or txt == "thermalcamera.":
             print("True syntax is ---->  ThermalCamera.pro")
+        elif txt == "dark" or txt == "darkcamera" or txt == "darkcamera.":
+            print("True syntax is ---->  DarkCamera.pro")
         else:
             if len(text)>0 and is_cd == False:
                 result,error = Prometheum.run('<stdio>',text)
