@@ -29,10 +29,11 @@ from flask import Flask,jsonify
 import GenerateNFT
 from time import sleep
 import random
- 
-
-
- 
+import subprocess
+import json
+from web3.middleware import geth_poa_middleware
+import cv2
+import numpy as np
 """
 import scapy.all as scapy
 import re
@@ -82,8 +83,60 @@ def Storj():
         print(private_key)
         print(public_key)
     
-"""    
+"""  
+  
+def thermal_camera():
+    print("If you want exit enter the 'esc' keyword.")
+    video = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+    video.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y','1','6',' '))
+    video.set(cv2.CAP_PROP_CONVERT_RGB, 0)
+
+    if video.isOpened(): # try to get the first frame
+       rval, frame = video.read()
+    else:
+       rval = False
+
+# Create an object for executing CLAHE.  
     
+    while rval:
+    # Get a Region of Interest slice - ignore the last 3 rows. 
+       frame_roi = frame[:-3, :]
+
+    # Normalizing frame to range [0, 255], and get the result as type uint8.
+       normed = cv2.normalize(frame_roi, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+
+    # Apply CLAHE - contrast enhancement.
+    # Note: apply the CLAHE on the uint8 image after normalize.
+    # CLAHE supposed to work with uint16 - you may try using it without using cv2.normalize
+       
+       """
+       cl1 = clahe.apply(ex)
+       """
+       nor = cv2.cvtColor(np.uint8(normed), cv2.COLOR_BGR2HSV)  # Convert gray-scale to BGR (no really needed).
+
+       cv2.imshow("camera", cv2.resize(nor, dsize=(640, 480), interpolation=cv2.INTER_LINEAR))
+       key = cv2.waitKey(1)
+       if key == 27: # exit on ESC
+          cv2.destroyAllWindows()
+          video.release()
+          break
+
+    # Grab the next frame from the camera.
+       rval, frame = video.read()
+    
+
+
+
+def CheckNetVisible():
+    # using the check_output() for having the network term retrieval
+    devices = subprocess.check_output(['netsh','wlan','show','network'])
+    # decode it to strings
+    devices = devices.decode('ascii')
+    devices = devices.replace("\r","")
+ 
+    # displaying the information
+    print(devices)
+
 
 
 def Vpn():
@@ -127,15 +180,17 @@ def Ethereum():
         if web3.isConnected():
             print("Connect Ethereum --> True")
             print("1.Info about Ethereum")
-            print("2.Send Ethereum Another Account")
-             
-            choice = input("Enter 1 or 2: ")
+            print("2.Send Test Ethereum Another Account From Ganache")
+              
+            choice = input("Enter '1' or '2' or '3': ")
             if choice == "1":
                 blocks_num = web3.eth.blockNumber
                 last_block = web3.eth.getBlock('latest')
                 last_block_trans = web3.eth.getBlockTransactionCount('latest')
                 difficulty_last_block = last_block.difficulty
                 all_trans = web3.eth.getTransactionCount
+                gas_price = web3.eth.gasPrice
+                print(f"Ethereum Gas Price --> {gas_price}")
                 print(f"Ethereum Block Numbers --> {blocks_num}")
                 print(f"Ethereum All Transactions Number --> {all_trans}") 
                 print(f"Ethereum Last Block Transactions Number --> {last_block_trans}") 
@@ -143,33 +198,34 @@ def Ethereum():
                 print(web3.toJSON(last_block))
             elif choice == "2":
                 ganache_url = "https://mainnet.infura.io/v3/f3092718f2f146169c2b1f7d53b99b7a"
-                web3 = Web3(Web3.HTTPProvider(ganache_url))
+                w3 = Web3(Web3.HTTPProvider(ganache_url))
                 account_1 = input("Enter a Your Ethereum Address: ")
                 if account_1:
-                    balance = web3.eth.getBalance(account_1)
+                    balance = w3.eth.getBalance(account_1)
                     print(f"ETH Balance In Your Address: {balance}")
                     account_2 = input("Enter a Another Ethereum Address: ")
                     if account_2:
-                        balance2= web3.eth.getBalance(account_2)
+                        balance2= w3.eth.getBalance(account_2)
                         print(f"ETH Balance In Another Address: {balance2}")
                         private_key = input("Enter a Your Private Key: ")
                         value =   input("Enter a ETH Amount: ")
-                        nonce = web3.eth.getTransactionCount(account_1)
+                        nonce = w3.eth.getTransactionCount(account_1)
                         if private_key and value:
                                tx = {'nonce':nonce,
                                   'to':account_2,
                                   'value':web3.toWei(float(value),'ether'),
                                   'gas':200000,
-                                  'gasPrice':web3.toWei('50','gwei')}
-                               signed_tx = web3.eth.account.signTransaction(tx,private_key)
-                               tx_hash = web3.eth.sendRawTransaction(signed_tx.rawTransaction)
+                                  'gasPrice':w3.toWei('50','gwei')} 
+                               signed_tx = w3.eth.account.signTransaction(tx,private_key)
+                               tx_hash = w3.eth.sendRawTransaction(signed_tx.rawTransaction)
                                print(f"Transaction is success! Hash --> {tx_hash}")
                         else:
                             print("Transaction --> Error")
+           
         else:
             print("Connect Ethereum --> False")
-    except:
-          print("Ethereum Situation --> Error")        
+    except Exception as ex:
+          print(f"Ethereum Situation --> Error: {ex}")        
     
     
 
@@ -583,6 +639,8 @@ while True:
         PhoneNumberInfo()
     elif text == "GenerateNFT.pro":
         GenerateNFT.GenerateNFT()
+    elif text == "ThermalCamera.pro":
+        thermal_camera()
     elif text == "color.green":
         os.system('COLOR A')
     elif text == "color.blue":
@@ -624,6 +682,8 @@ while True:
             print("True syntax is ---->  Ethereum.pro")
         elif txt == "generate" or txt == "generatenft" or txt == "nft" or txt == "generatenft.":
             print("True syntax is ---->  GenerateNFT.pro")
+        elif txt == "thermal" or txt == "thermalcamera" or txt == "thermalcamera.":
+            print("True syntax is ---->  ThermalCamera.pro")
         else:
             if len(text)>0 and is_cd == False:
                 result,error = Prometheum.run('<stdio>',text)
