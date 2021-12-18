@@ -193,6 +193,7 @@ def AzureDescribeAnalysis():
     }
 
          response = requests.request("POST", url, data=payload, headers=headers, params=querystring)
+         print("Azure Computer Vision --> Success")
          print(response.json())
     
      except Exception as ex:
@@ -211,7 +212,7 @@ def AzureOCR():
     }
 
         response = requests.request("POST", url, data=payload, headers=headers)
-
+        print("Azure Computer Vision --> Success")
         print(response.json())
     except Exception as ex:
         print(f"Azure Computer Vision Error --> {ex}")    
@@ -242,7 +243,7 @@ def AzureTextAI():
     }
 
             response = requests.request("POST", url, data=payload, headers=headers, params=querystring)
-
+            print("Azure Computer Vision --> Success")
             print(response.json()['PII'])
          except Exception as ex:
             no_pii = f"{ex}"
