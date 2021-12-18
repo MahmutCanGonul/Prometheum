@@ -664,6 +664,18 @@ while True:
         thermal_camera()
     elif text == "DarkCamera.pro":
         DarkCamera()
+    elif text == "ImageAnalysis.pro":
+        GenerateNFT.AzureImageAnalysis()
+    elif text == "ImageDescribe.pro":
+        GenerateNFT.AzureDescribeAnalysis()
+    elif text == "FaceAI.pro":
+        GenerateNFT.AzureFaceAI()
+    elif text == "Blob.pro":
+        GenerateNFT.AzureBlob()
+    elif text == "TextAI.pro":
+        GenerateNFT.AzureTextAI()
+    elif text == "OCRAI.pro":
+        GenerateNFT.AzureOCR()
     elif text == "color.green":
         os.system('COLOR A')
     elif text == "color.blue":
@@ -695,7 +707,7 @@ while True:
             print("True syntax is ---->  color.COLOR_NAME / EX: color.green")
         elif txt == "history" or  txt == "history.":
             print("True syntax is ---->  History.pro")
-        elif txt == "imageinfo" or txt == "image info" or  txt == "image" or txt == "image info.pro" or txt == "imageinfo." :
+        elif txt == "imageinfo" or txt == "image info"  or txt == "image info.pro" or txt == "imageinfo." :
             print("True syntax is ---->  ImageInfo.pro")
         elif txt == "malwaredetection" or txt == "malware detection" or  txt == "malwaredetection." or txt == "malware detection.":
             print("True syntax is ---->  MalwareDetection.pro")
@@ -709,6 +721,16 @@ while True:
             print("True syntax is ---->  ThermalCamera.pro")
         elif txt == "dark" or txt == "darkcamera" or txt == "darkcamera.":
             print("True syntax is ---->  DarkCamera.pro")
+        elif txt == "blob" or txt == "blob.":
+            print("True syntax is ---->  Blob.pro")
+        elif txt == "image":
+            print("True syntax is ---->  ImageAnalysis.pro or ImageDescribe.pro or ImageInfo.pro")
+        elif txt == "imageanalysis" or  txt == "imageanalysis." or txt == "image analysis.":
+            print("True syntax is ---->  ImageAnalysis.pro")
+        elif txt == "imagedescribe" or  txt == "imagedescribe." or txt == "image describe.":
+            print("True syntax is ---->  ImageDescribe.pro")
+        elif txt == "ai":
+            print("True syntax is ---->  FaceAI.pro or TextAI.pro or OCRAI")   
         else:
             if len(text)>0 and is_cd == False:
                 result,error = Prometheum.run('<stdio>',text)
