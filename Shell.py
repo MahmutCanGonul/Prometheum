@@ -90,7 +90,7 @@ def Storj():
 """  
   
 def thermal_camera():
-    print("If you want exit enter the 'exit' keyword.")
+    print("If you want exit enter the 'esc' keyword.")
      
     video = cv2.VideoCapture(0,cv2.CAP_DSHOW)
     video.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y','1','6',' '))
@@ -691,7 +691,6 @@ while True:
     elif text == "color.white":
         os.system('COLOR F')
     else:
-        
         txt = text.lower()
         if txt == "handrecognition" or txt == "hand recognition" or  txt == "handrecognition.pr" or txt == "hand recognition.pro" or txt == "handrecognition." :
             print("True syntax is ----> HandRecognition.pro")
