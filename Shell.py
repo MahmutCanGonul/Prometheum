@@ -676,6 +676,8 @@ while True:
         GenerateNFT.AzureTextAI()
     elif text == "OCRAI.pro":
         GenerateNFT.AzureOCR()
+    elif text == "Translate.pro":
+        GenerateNFT.TranslateAI()
     elif text == "color.green":
         os.system('COLOR A')
     elif text == "color.blue":
@@ -730,6 +732,10 @@ while True:
             print("True syntax is ---->  ImageDescribe.pro")
         elif txt == "ai":
             print("True syntax is ---->  FaceAI.pro or TextAI.pro or OCRAI")   
+        elif txt == "translate":
+            print("True syntax is ---->  Translate.pro")   
+            
+       
         else:
             if len(text)>0 and is_cd == False:
                 result,error = Prometheum.run('<stdio>',text)
