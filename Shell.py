@@ -678,6 +678,8 @@ while True:
         GenerateNFT.AzureOCR()
     elif text == "Translate.pro":
         GenerateNFT.TranslateAI()
+    elif text == "Search.pro":
+        GenerateNFT.AzureBingSearch()
     elif text == "color.green":
         os.system('COLOR A')
     elif text == "color.blue":
@@ -733,7 +735,11 @@ while True:
         elif txt == "ai":
             print("True syntax is ---->  FaceAI.pro or TextAI.pro or OCRAI")   
         elif txt == "translate":
-            print("True syntax is ---->  Translate.pro")   
+            print("True syntax is ---->  Translate.pro") 
+        elif txt == "search":
+            print("True syntax is ---->  Search.pro") 
+      
+            
             
        
         else:
