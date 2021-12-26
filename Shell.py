@@ -455,23 +455,31 @@ def Wikipedia():
     else:
         print("I can not find a result...")
 
+
+def github_help():
+            print("'clone' --> Clone the repo on your directory")
+            print('repo.name --> See the all repo names')
+            print("'search_language' --> Show the repo from the language")
+            print("'repo.files' --> Show the files in repo")
+            print("'repo.traffic' --> Show the repo clone and view traffic")
+            print("'repo.branches' --> Show the branches in repo")
+            print("'create.issue' --> Create the issue description in repo")
+            print("'close.issue' --> Close all issues in the repo")
+            print("'open.issue' --> Open all issues in the repo")
+            print("'create.milestone' --> Create a milestone with description in repo")
+            print("'create.repo' --> Create a repo")
+            print("'create.file' --> Create a specific file in repo")
+            print("'delete.file' --> Delete a specific file in repo")
+            print("'help' --> Show again commits and describes")
+            print("'exit' --> exit the platfrom")
+
 def github(path):
     access_tok = input("Enter a Own Access Token in Github: ")
     if access_tok:
         try:
             g = Github(access_tok)
+            github_help()
             while True:
-                print("'clone' --> Clone the repo on your directory")
-                print('repo.name --> See the all repo names')
-                print("'search_language' --> Show the repo from the language")
-                print("'repo.files' --> Show the files in repo")
-                print("'repo.traffic' --> Show the repo clone and view traffic")
-                print("'repo.branches' --> Show the branches in repo")
-                print("'create.issue' --> Create the issue description in repo")
-                print("'close.issue' --> Close all issues in the repo")
-                print("'open.issue' --> Open all issues in the repo")
-                print("'create.milestone' --> Create a milestone with description in repo")
-                print("'exit' --> exit the platfrom")
                 choice = input("Enter a Choice: ")
                 if choice == "clone":
                     repo_url = input("Enter the target repo url: ")
@@ -551,12 +559,48 @@ def github(path):
                             if desc:
                                 repo.create_milestone(title=title, state='open', description=desc)
                                 print("Github Created MileStone --> Success")
-                                
+                         
+                elif choice == "create.repo":
+                    user = g.get_user()
+                    repo_name = input("Enter a Repo Name: ")
+                    if  repo_name:
+                         user.create_repo(repo_name)
+                         print("Github Created Repo --> Success")
+                         
+                elif choice == "create.file":
+                    repo_name = input("Enter a repo name: ")
+                    if repo_name:
+                        repo = g.get_user().get_repo(repo_name)
+                        branches = repo.get_branches()
+                        print(list(branches))
+                        file_name = input("Enter a file name: ")
+                        if file_name:
+                            commit_name = input("Enter a commit: ")
+                            if commit_name:
+                                branch_name = input("Enter a branch name for commit: ")
+                                repo.create_file(file_name,commit_name,commit_name,branch=branch_name)
+                                print("Github Created File --> Success")
+                
+                elif choice == "delete.file":
+                    repo_name = input("Enter a repo name: ")
+                    if repo_name:
+                        repo = g.get_user().get_repo(repo_name)
+                        branches = repo.get_branches()
+                        print(list(branches))
+                        file_name = input("Enter a file name: ")
+                        if file_name:
+                            branch_name = input("Enter a branch name for commit: ")
+                            if branch_name:
+                                contents = repo.get_contents(file_name, ref=branch_name)
+                                repo.delete_file(contents.path, "remove file", contents.sha, branch=branch_name)
+                                print("Github Delete File --> Success")
+                            
+                            
                     
-                    
-                        
-                        
-                    
+                
+                
+                elif choice == "help":
+                     github_help()
                     
                        
                        
