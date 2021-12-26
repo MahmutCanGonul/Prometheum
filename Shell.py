@@ -467,6 +467,10 @@ def github(path):
                 print("'repo.files' --> Show the files in repo")
                 print("'repo.traffic' --> Show the repo clone and view traffic")
                 print("'repo.branches' --> Show the branches in repo")
+                print("'create.issue' --> Create the issue description in repo")
+                print("'close.issue' --> Close all issues in the repo")
+                print("'open.issue' --> Open all issues in the repo")
+                print("'create.milestone' --> Create a milestone with description in repo")
                 print("'exit' --> exit the platfrom")
                 choice = input("Enter a Choice: ")
                 if choice == "clone":
@@ -513,7 +517,46 @@ def github(path):
                     if repo_name:
                         repo = g.get_user().get_repo(repo_name) 
                         list(repo.get_branches())
+                 
+                elif choice == "create.issue":
+                    repo_name = input("Enter a repo name: ")
+                    if repo_name:
+                        repo = g.get_user().get_repo(repo_name)
+                        issue = input("Enter a issue about repo: ")
+                        repo.create_issue(title=issue)
+                        print("Github Created Issue --> Success")
+                 
+                elif choice == "close.issue":
+                    repo_name = input("Enter a repo name: ")
+                    if repo_name:
+                        repo = g.get_user().get_repo(repo_name)
+                        open_issues = repo.get_issues(state='open')
+                        for issue in open_issues:
+                            issue.edit(state='closed')
+                elif choice == "open.issue":
+                    repo_name = input("Enter a repo name: ")
+                    if repo_name:
+                        repo = g.get_user().get_repo(repo_name)
+                        open_issues = repo.get_issues(state='closed')
+                        for issue in open_issues:
+                            issue.edit(state='open')
+                
+                elif choice == "create.milestone":
+                    repo_name = input("Enter a repo name: ")
+                    if repo_name:
+                        repo = g.get_user().get_repo(repo_name)
+                        title = input("Enter a title for milestone: ")
+                        if title:
+                            desc = input("Enter a description for milestone: ")
+                            if desc:
+                                repo.create_milestone(title=title, state='open', description=desc)
+                                print("Github Created MileStone --> Success")
+                                
+                    
+                    
                         
+                        
+                    
                     
                        
                        
